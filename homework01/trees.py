@@ -3,7 +3,9 @@
 """
 Version 0.1
 
-Cílem je vykreslit v "UTF16-artu" strom definovaný listem hodnot. Každý vnitřní uzel stromu obsahuje vždy dvě položky: název uzlu a seznam potomků (nemusí být nutně v tomto pořadí). Názvem může být jakýkoli objekt kromě typu list (seznam).
+Cílem je vykreslit v "UTF16-artu" strom definovaný listem hodnot.
+Každý vnitřní uzel stromu obsahuje vždy dvě položky: název uzlu a seznam potomků
+ (nemusí být nutně v tomto pořadí). Názvem může být jakýkoli objekt kromě typu list (seznam).
 
 Příklady validních stromů:
     - triviální strom o 1 uzlu: [1, []]
@@ -120,8 +122,77 @@ Odkazy:
 https://en.wikipedia.org/wiki/Box_Drawing
 """
 
+class InvalidTree(Exception):
+    """Tree is None"""
 
-# zachovejte interface metody
+
+def render_rec(tree: list = None, indent: int = 2, separator: str = ' ', parrent: str = '', pref: str = '', isLast: bool = True, root: bool = False ) -> str:
+    """Recursively prints tree"""
+    if tree is None or not isinstance(tree, list):
+        raise InvalidTree('Invalid tree')  
+    isList = False
+    for i in tree:
+        if isinstance(i, list):
+            isList = True
+    if not isList and root:
+        raise InvalidTree('Invalid tree')  
+    if isList is False:
+        string = ''
+        for i in range(0,len(tree)):
+            if i != len(tree) - 1:
+                string = string + parrent + '├' + (indent-2)*'─' + '>' + str(tree[i]) + '\n'
+            else:
+                string = string + parrent + '└' + (indent-2)*'─' + '>' + str(tree[i]) + '\n'
+        return string
+
+    if isinstance(tree[0], list):
+        tree[0], tree[1] = tree[1], tree[0]
+    if root:
+        string = str(tree[0]) + '\n'
+    else:
+        if isLast:
+            string = parrent + '└' + (indent-2)*'─' + '>' + str(tree[0]) + '\n'
+        else:
+            string = parrent + '├' + (indent-2)*'─' + '>' + str(tree[0]) + '\n'
+    listOfLists = True
+    for i in tree[1]:
+        if not isinstance(i, list):
+            listOfLists = False
+    if listOfLists:
+        for i in range (0,len(tree[1])):
+            if i != len(tree[1]) - 1:
+                string = string + render_rec( tree[1][i], indent, separator, pref, pref + '│' + separator * (indent - 1), False )
+            else:
+                string = string + render_rec( tree[1][i], indent, separator, pref, pref + separator * (indent), True )
+    else:
+        string = string + render_rec( tree[1], indent, separator, pref, pref + separator * (indent), True )
+    return string
+
+
 def render_tree(tree: list = None, indent: int = 2, separator: str = ' ') -> str:
+    """Calls recursive function"""
+    return render_rec ( tree, indent, separator, '', '', True, True)
 
-    return ''
+
+print(render_tree([[[1, [True, ['abc', 'def']]], [2, [3.14159, 6.023e23]]], 42], 4, '.'))
+print(render_tree([6, [[[[1, [2, 3]], [42, [-43, 44]]], 4], 5]], 2, ' '))
+print(render_tree([[[1, [[True, ['abc', 'def']], [False, [1, 2]]]], [2, [3.14159, 6.023e23, 2.718281828]], [3, ['x', 'y']], [4, []]], 42], 4, '.'))
+print(render_tree([6, [5, ['dva\nradky']]], 2, ' '))
+print(render_tree([[[1, [2, [4, 5]]], [42, [43, 44]]], 3], 4, ' '))
+
+try:
+    print(render_tree([], 4, ' '))
+except InvalidTree:
+    print("None")
+try:
+    print(render_tree([666], 4, ' '))
+except InvalidTree:
+    print("666")
+try:
+    print(render_tree([1,2], 4, ' '))
+except InvalidTree:
+    print("1,2")
+try:
+    print(render_tree((1,[2,3]), 4, ' '))
+except InvalidTree:
+    print("())")
