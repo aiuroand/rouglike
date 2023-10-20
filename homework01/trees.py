@@ -122,38 +122,58 @@ Odkazy:
 https://en.wikipedia.org/wiki/Box_Drawing
 """
 
+
 class InvalidTree(Exception):
-    """Tree is None"""
+    """Tree is invalid"""
 
 
-def render_rec(tree: list = None, indent: int = 2, separator: str = ' ', parrent: str = '', pref: str = '', isLast: bool = True, root: bool = False ) -> str:
+def printFinal( tree: list = None, indent: int = 2, parent: str =' ' ) -> str:
+    """Prints lists of tree"""
+    string = ''
+    for i in enumerate(tree):
+        if i[0] != len(tree) - 1:
+            string = string + parent + '├' + (indent-2)*'─' + '>' + str(tree[i[0]]) + '\n'
+        else:
+            string = string + parent + '└' + (indent-2)*'─' + '>' + str(tree[i[0]]) + '\n'
+    return string
+
+
+def printNode ( tree: list = None, indent: int = 2, isLast: bool = True, parent: str = '' ) -> str:
+    """Prints a node of tree that is not a list"""
+    if isLast:
+        string = parent + '└' + (indent-2)*'─' + '>' + str(tree[0]) + '\n'
+    else:
+        string = parent + '├' + (indent-2)*'─' + '>' + str(tree[0]) + '\n'
+    return string
+
+
+def makeCorrect(tree: list = None):
+    """Swaps elements in list so root will always be on 0th index"""
+    if isinstance(tree[0], list):
+        tree[0], tree[1] = tree[1], tree[0]
+
+
+def printRoot(tree: list = None, indent: int = 2, parent: str = '', isLast: bool = True, root: bool = False) -> str:
+    """Prints root of a current list"""
+    makeCorrect(tree)
+    if root:
+        string = str(tree[0]) + '\n'
+    else:
+        string = printNode(tree, indent, isLast, parent)
+    return string
+
+
+def render_rec(tree: list = None, indent: int = 2, separator: str = ' ', prefix: list = None, pair: list = None ) -> str:
     """Recursively prints tree"""
-    if tree is None or not isinstance(tree, list):
-        raise InvalidTree('Invalid tree')  
     isList = False
     for i in tree:
         if isinstance(i, list):
             isList = True
-    if not isList and root:
-        raise InvalidTree('Invalid tree')  
+    if (not isList and pair[1]) or (tree is None) or (not isinstance(tree, list)):
+        raise InvalidTree('Invalid tree')
     if isList is False:
-        string = ''
-        for i in range(0,len(tree)):
-            if i != len(tree) - 1:
-                string = string + parrent + '├' + (indent-2)*'─' + '>' + str(tree[i]) + '\n'
-            else:
-                string = string + parrent + '└' + (indent-2)*'─' + '>' + str(tree[i]) + '\n'
-        return string
-
-    if isinstance(tree[0], list):
-        tree[0], tree[1] = tree[1], tree[0]
-    if root:
-        string = str(tree[0]) + '\n'
-    else:
-        if isLast:
-            string = parrent + '└' + (indent-2)*'─' + '>' + str(tree[0]) + '\n'
-        else:
-            string = parrent + '├' + (indent-2)*'─' + '>' + str(tree[0]) + '\n'
+        return printFinal( tree, indent, prefix[0] )
+    string = printRoot(tree, indent, prefix[0], pair[0], pair[1])
     listOfLists = True
     for i in tree[1]:
         if not isinstance(i, list):
@@ -161,17 +181,17 @@ def render_rec(tree: list = None, indent: int = 2, separator: str = ' ', parrent
     if listOfLists:
         for i in range (0,len(tree[1])):
             if i != len(tree[1]) - 1:
-                string = string + render_rec( tree[1][i], indent, separator, pref, pref + '│' + separator * (indent - 1), False )
+                string = string + render_rec( tree[1][i], indent, separator, [prefix[1], prefix[1] + '│' + separator * (indent - 1)], [False, False] )
             else:
-                string = string + render_rec( tree[1][i], indent, separator, pref, pref + separator * (indent), True )
+                string = string + render_rec( tree[1][i], indent, separator, [prefix[1], prefix[1] + separator * (indent)], [True, False] )
     else:
-        string = string + render_rec( tree[1], indent, separator, pref, pref + separator * (indent), True )
+        string = string + render_rec( tree[1], indent, separator, [prefix[1], prefix[1] + separator * (indent)], [True, False] )
     return string
 
 
 def render_tree(tree: list = None, indent: int = 2, separator: str = ' ') -> str:
     """Calls recursive function"""
-    return render_rec ( tree, indent, separator, '', '', True, True)
+    return render_rec ( tree, indent, separator, ['', ''], [True, True])
 
 
 print(render_tree([[[1, [True, ['abc', 'def']]], [2, [3.14159, 6.023e23]]], 42], 4, '.'))
@@ -196,3 +216,7 @@ try:
     print(render_tree((1,[2,3]), 4, ' '))
 except InvalidTree:
     print("())")
+
+# l = [1,2,3]
+# for i in enumerate(l):
+#     print(i)
