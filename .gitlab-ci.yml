@@ -4,8 +4,10 @@
 # Even a slight change will make the signature invalid and the CI pipelines will stop working for you.
 # If that happens you need to restore the original content of this file.
 
-#image: python-custom:latest
-image: ${CI_DEPENDENCY_PROXY_GROUP_IMAGE_PREFIX}/python-custom:latest
+# image je, zda se, nedostupny, byval tam python 3.8
+image:
+  name: $CI_REGISTRY/bi-pyt/python-custom:master
+  entrypoint: [ '/bin/bash', '-c', 'ln -snf /bin/bash /bin/sh && /bin/bash -c $0' ]
 
 variables:
   CONFIG_VERSION: 1
@@ -186,9 +188,7 @@ validate-homework04:
 
 ########################################################################
 before_script:
-  - pip install --upgrade pip >/dev/null
-  - pip install --upgrade numpy>=1.23.5 >/dev/null
-  - pip install pytest pytest-timeout pylint>=2.13 numpy pillow ipython pandas matplotlib opencv-python-headless
+#  - pip install pytest pytest-timeout pylint>=2.13 numpy>=1.23.5 pillow ipython pandas matplotlib opencv-python-headless
+  - pip install pylint>=2.13 || true
   - pytest --version
   - pylint --version
-
