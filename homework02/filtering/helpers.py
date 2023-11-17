@@ -58,6 +58,8 @@ filters = {
     'Gaussian blur 5x5 (approx)': approx_gaussian_blur_5_kernel,
     'Edge detection': edge_detection_kernel,
     'Embossing': embossing_kernel,
+    'RC1': roberts_cross_2_kernel,
+    'RC2': roberts_cross_2_kernel,
 }
 
 
