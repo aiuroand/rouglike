@@ -54,11 +54,10 @@ def apply_filter(image: np.array, kernel: np.array) -> np.array:
     assert kernel.ndim == 2
     assert kernel.shape[0] == kernel.shape[1]
     if kernel.shape[0]%2 == 0:
-        z = np.zeros((3,3), np.int8)
-        z[0][0] = kernel[0][0]
-        z[0][1] = kernel[0][1]
-        z[1][0] = kernel[1][0]
-        z[1][1] = kernel[1][1]
+        z = np.zeros((kernel.shape[0]+1,kernel.shape[1]+1), np.int8)
+        for i in range(kernel.shape[0]):
+            for j in range(kernel.shape[1]):
+                z[i][j] = kernel[i][j]
         kernel=z
     newimage = image.copy()
     if image.ndim == 3:
