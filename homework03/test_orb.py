@@ -2,7 +2,7 @@ import math
 import cv2
 import pytest
 import numpy as np
-from scipy.signal import convolve2d
+# from scipy.signal import convolve2d
 # from scipy.spatial.distance import cdist
 from pathlib import Path
 # from utils import apply_gaussian_2d

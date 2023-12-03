@@ -211,11 +211,15 @@ def get_x_derivative(img: np.ndarray) -> np.ndarray:
         X-derivative of the input image.
     """
     img = img.astype(int)
-    result = convolve2d(img, np.matrix([1,2,1]).T@np.matrix([1,0,-1]), mode='same')
-    result[0,:] = 0
-    result[-1,:] = 0
-    result[:,0] = 0
-    result[:,-1] = 0
+    result = np.zeros((img.shape), dtype=int)
+    ker = np.matrix([1,2,1]).T@np.matrix([1,0,-1])
+    for i in range(1, img.shape[0] - 1):
+        for j in range(1, img.shape[1] - 1):
+            s = 0
+            for k1 in range(-1,2):
+                for k2 in range(-1,2):
+                    s += ker[1+k1,1+k2] * img[i+k1][j+k2]
+            result[i][j] = int(s) * -1
     return result
 
 
@@ -235,11 +239,15 @@ def get_y_derivative(img: np.ndarray) -> np.ndarray:
         Y-derivative of the input image.
     """
     img = img.astype(int)
-    result = convolve2d(img, np.matrix([1,0,-1]).T@np.matrix([1,2,1]), mode='same')
-    result[0,:] = 0
-    result[-1,:] = 0
-    result[:,0] = 0
-    result[:,-1] = 0
+    result = np.zeros((img.shape), dtype=int)
+    ker = np.matrix([1,0,-1]).T@np.matrix([1,2,1])
+    for i in range(1, img.shape[0] - 1):
+        for j in range(1, img.shape[1] - 1):
+            s = 0
+            for k1 in range(-1,2):
+                for k2 in range(-1,2):
+                    s += ker[1+k1,1+k2] * img[i+k1][j+k2]
+            result[i][j] = int(s) * -1
     return result
 
 
