@@ -4,7 +4,6 @@ from typing import Tuple
 import cv2
 import numpy as np
 from utils import apply_gaussian_2d
-from scipy.signal import convolve2d
 
 FAST_CIRCLE_RADIUS = 3
 FAST_ROW_OFFSETS = [-3, -3, -2, -1, 0, 1, 2, 3, 3, 3, 2, 1, 0, -1, -2, -3]
