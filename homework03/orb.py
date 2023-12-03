@@ -3,9 +3,8 @@ from typing import List
 from typing import Tuple
 import cv2
 import numpy as np
-from scipy import signal
 from utils import apply_gaussian_2d
-
+from scipy.signal import convolve2d
 
 FAST_CIRCLE_RADIUS = 3
 FAST_ROW_OFFSETS = [-3, -3, -2, -1, 0, 1, 2, 3, 3, 3, 2, 1, 0, -1, -2, -3]
@@ -212,7 +211,7 @@ def get_x_derivative(img: np.ndarray) -> np.ndarray:
         X-derivative of the input image.
     """
     img = img.astype(int)
-    result = signal.convolve2d(img, np.matrix([1,2,1]).T@np.matrix([1,0,-1]), mode='same')
+    result = convolve2d(img, np.matrix([1,2,1]).T@np.matrix([1,0,-1]), mode='same')
     result[0,:] = 0
     result[-1,:] = 0
     result[:,0] = 0
@@ -236,7 +235,7 @@ def get_y_derivative(img: np.ndarray) -> np.ndarray:
         Y-derivative of the input image.
     """
     img = img.astype(int)
-    result = signal.convolve2d(img, np.matrix([1,0,-1]).T@np.matrix([1,2,1]), mode='same')
+    result = convolve2d(img, np.matrix([1,0,-1]).T@np.matrix([1,2,1]), mode='same')
     result[0,:] = 0
     result[-1,:] = 0
     result[:,0] = 0
