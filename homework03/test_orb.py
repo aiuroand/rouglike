@@ -91,46 +91,46 @@ def test_create_pyramid(input_image, n_pyr_layers, downscale_factor):
 
 
 # Let student to solve detect_keypoints without helper mask arrays.
-# @pytest.mark.parametrize(
-#     "threshold,border", [[5, 0], [5, 10], [10, 0], [10, 20], [20, 0], [20, 20]]
-# )
-# def test_get_first_test_mask(input_image, threshold, border):
-#     img_base, img = input_image
-#     border = max(border, orb.FAST_CIRCLE_RADIUS)
-#     mask = orb.get_first_test_mask(img.astype(int), threshold, border)
-#     assert isinstance(mask, np.ndarray)
-#     assert mask.shape == img.shape
-#     assert mask[:border, :].sum() == 0
-#     assert mask[:, :border].sum() == 0
-#     assert mask[-border:, :].sum() == 0
-#     assert mask[:, -border:].sum() == 0
-#     mask_ref = np.load(REF_PATH / f"{img_base}_{threshold}_{border}_get_first_test_mask.npz")['mask_ref']
-#     x, y = img.shape
-#     assert (
-#         np.equal(mask, mask_ref).sum() / x / y > 0.98
-#     )  # might depend on dtype whether it is passed as int or np.uint8
+@pytest.mark.parametrize(
+    "threshold,border", [[5, 0], [5, 10], [10, 0], [10, 20], [20, 0], [20, 20]]
+)
+def test_get_first_test_mask(input_image, threshold, border):
+    img_base, img = input_image
+    border = max(border, orb.FAST_CIRCLE_RADIUS)
+    mask = orb.get_first_test_mask(img.astype(int), threshold, border)
+    assert isinstance(mask, np.ndarray)
+    assert mask.shape == img.shape
+    assert mask[:border, :].sum() == 0
+    assert mask[:, :border].sum() == 0
+    assert mask[-border:, :].sum() == 0
+    assert mask[:, -border:].sum() == 0
+    mask_ref = np.load(REF_PATH / f"{img_base}_{threshold}_{border}_get_first_test_mask.npz")['mask_ref']
+    x, y = img.shape
+    assert (
+        np.equal(mask, mask_ref).sum() / x / y > 0.98
+    )  # might depend on dtype whether it is passed as int or np.uint8
 
 
 # Let student to solve detect_keypoints without helper mask arrays.
-# @pytest.mark.parametrize(
-#     "threshold,border", [[5, 0], [5, 10], [10, 0], [10, 20], [20, 0], [20, 20]]
-# )
-# def test_get_second_test_mask(input_image, threshold, border):
-#     img_base, img = input_image
-#     border = max(border, orb.FAST_CIRCLE_RADIUS)
-#     mask1 = orb.get_first_test_mask(img.astype(int), threshold, border)
-#     mask = orb.get_second_test_mask(img.astype(int), mask1, threshold)
-#     assert isinstance(mask, np.ndarray)
-#     assert mask.shape == img.shape
-#     assert mask[:border, :].sum() == 0
-#     assert mask[:, :border].sum() == 0
-#     assert mask[-border:, :].sum() == 0
-#     assert mask[:, -border:].sum() == 0
-#     mask_ref = np.load(REF_PATH / f"{img_base}_{threshold}_{border}_get_second_test_mask.npz")['mask_ref']
-#     x, y = img.shape
-#     assert (
-#         np.equal(mask, mask_ref).sum() / x / y > 0.98
-#     )  # might depend on dtype whether it is passed as int or np.uint8
+@pytest.mark.parametrize(
+    "threshold,border", [[5, 0], [5, 10], [10, 0], [10, 20], [20, 0], [20, 20]]
+)
+def test_get_second_test_mask(input_image, threshold, border):
+    img_base, img = input_image
+    border = max(border, orb.FAST_CIRCLE_RADIUS)
+    mask1 = orb.get_first_test_mask(img.astype(int), threshold, border)
+    mask = orb.get_second_test_mask(img.astype(int), mask1, threshold)
+    assert isinstance(mask, np.ndarray)
+    assert mask.shape == img.shape
+    assert mask[:border, :].sum() == 0
+    assert mask[:, :border].sum() == 0
+    assert mask[-border:, :].sum() == 0
+    assert mask[:, -border:].sum() == 0
+    mask_ref = np.load(REF_PATH / f"{img_base}_{threshold}_{border}_get_second_test_mask.npz")['mask_ref']
+    x, y = img.shape
+    assert (
+        np.equal(mask, mask_ref).sum() / x / y > 0.98
+    )  # might depend on dtype whether it is passed as int or np.uint8
 
 
 @pytest.mark.parametrize(

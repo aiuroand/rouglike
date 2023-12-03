@@ -1,8 +1,9 @@
-import math
-import cv2
-import numpy as np
+"""Docstring"""
 from typing import List
 from typing import Tuple
+import cv2
+import numpy as np
+from scipy import signal
 from utils import apply_gaussian_2d
 
 
@@ -34,8 +35,10 @@ def create_pyramid(
     pyr : List[np.ndarray]
         Pyramid of scaled images.
     """
-    pyr = []
-
+    pyr = [img]
+    for k in range(n_pyr_layers - 1):
+        new_im = cv2.resize(pyr[k], dsize=(round(pyr[k].shape[1] / downscale_factor), round(pyr[k].shape[0] / downscale_factor)))
+        pyr.append(new_im)
     return pyr
 
 
@@ -61,7 +64,19 @@ def get_first_test_mask(
         Boolean mask with True values at pixels which pass the first FAST test.
     """
     img_level = img_level.astype(int)
-    mask = ...
+    border = max(border, FAST_CIRCLE_RADIUS)
+    mask = np.zeros((img_level.shape[0], img_level.shape[1]), dtype=bool)
+    for i in range(0 + border, img_level.shape[0] - border):
+        for j in range(0 + border, img_level.shape[1] - border):
+            l = 0
+            d = 0
+            for k in FAST_FIRST_TEST_INDICES:
+                if img_level[i][j] > img_level[i + FAST_ROW_OFFSETS[k]][j + FAST_COL_OFFSETS[k]] + threshold:
+                    l+=1
+                elif img_level[i][j] < img_level[i + FAST_ROW_OFFSETS[k]][j + FAST_COL_OFFSETS[k]] - threshold:
+                    d+=1
+            if (d >= FAST_FIRST_TEST_THRESHOLD or l >= FAST_FIRST_TEST_THRESHOLD):
+                mask[i][j] = True
     return mask
 
 
@@ -90,8 +105,19 @@ def get_second_test_mask(
         Boolean mask with True values at pixels which pass the second FAST test.
     """
     img_level = img_level.astype(int)
-    mask = ...
-    return mask
+    for i in range(0, img_level.shape[0]):
+        for j in range(0, img_level.shape[1]):
+            if first_test_mask[i][j]:
+                l = 0
+                d = 0
+                for k in range(16):
+                    if img_level[i][j] > img_level[i + FAST_ROW_OFFSETS[k]][j + FAST_COL_OFFSETS[k]] + threshold:
+                        l+=1
+                    elif img_level[i][j] < img_level[i + FAST_ROW_OFFSETS[k]][j + FAST_COL_OFFSETS[k]] - threshold:
+                        d+=1
+                if (d < FAST_SECOND_TEST_THRESHOLD and l < FAST_SECOND_TEST_THRESHOLD):
+                    first_test_mask[i][j] = False
+    return first_test_mask
 
 
 def calculate_kp_scores(
@@ -114,7 +140,20 @@ def calculate_kp_scores(
         Scores for the tentative keypoints.
     """
     img_level = img_level.astype(int)
-    scores = ...
+    scores = []
+    for i, j in keypoints:
+        minimums = []
+        for k in range(16):
+            rolled_col = np.roll(FAST_COL_OFFSETS, k)
+            rolled_row = np.roll(FAST_ROW_OFFSETS, k)
+            minimum = 10000000
+            for r in range(9):
+                tmp = abs(img_level[i][j] - img_level[i + rolled_row[r]][j + rolled_col[r]])
+                if tmp < minimum:
+                    minimum = tmp
+            minimums.append(minimum)
+        scores.append(max(minimums))
+    scores = [int(x) for x in scores]
     return scores
 
 
@@ -147,7 +186,13 @@ def detect_keypoints(
     """
     border = max(border, FAST_CIRCLE_RADIUS)
     keypoints, scores = [], []
-    ...
+    first_mask = get_first_test_mask(img_level=img_level, threshold=threshold, border=border)
+    second_mask = get_second_test_mask(img_level=img_level, first_test_mask=first_mask, threshold=threshold)
+    for i in range(0, img_level.shape[0]):
+        for j in range(0, img_level.shape[1]):
+            if second_mask[i][j]:
+                keypoints.append((i, j))
+    scores = calculate_kp_scores(img_level=img_level, keypoints=keypoints)
     return keypoints, scores
 
 
@@ -167,7 +212,11 @@ def get_x_derivative(img: np.ndarray) -> np.ndarray:
         X-derivative of the input image.
     """
     img = img.astype(int)
-    result = ...
+    result = signal.convolve2d(img, np.matrix([1,2,1]).T@np.matrix([1,0,-1]), mode='same')
+    result[0,:] = 0
+    result[-1,:] = 0
+    result[:,0] = 0
+    result[:,-1] = 0
     return result
 
 
@@ -187,7 +236,11 @@ def get_y_derivative(img: np.ndarray) -> np.ndarray:
         Y-derivative of the input image.
     """
     img = img.astype(int)
-    result = ...
+    result = signal.convolve2d(img, np.matrix([1,0,-1]).T@np.matrix([1,2,1]), mode='same')
+    result[0,:] = 0
+    result[-1,:] = 0
+    result[:,0] = 0
+    result[:,-1] = 0
     return result
 
 
@@ -212,10 +265,13 @@ def get_harris_response(img: np.ndarray) -> np.ndarray:
     """
     dx, dy = get_x_derivative(img), get_y_derivative(img)
     dx, dy = dx.astype(float) / 255.0, dy.astype(float) / 255.0
-    ixx = ...
-    ixy = ...
-    iyy = ...
-    harris_response = ...
+    ixx = dx*dx
+    ixy = dx*dy
+    iyy = dy*dy
+    ixx_G = apply_gaussian_2d(sigma=1.0, data=ixx)
+    ixy_G = apply_gaussian_2d(sigma=1.0, data=ixy)
+    iyy_G = apply_gaussian_2d(sigma=1.0, data=iyy)
+    harris_response = ixx_G*iyy_G - ixy_G*ixy_G - 0.05 * ((ixx_G+iyy_G)**2)
     return harris_response
 
 
@@ -244,7 +300,12 @@ def filter_keypoints(
         Filtered FAST keypoints.
     """
     harris_response = get_harris_response(img)
-    filtered_keypoints = ...
+    l = []
+    for i, j in keypoints:
+        l.append((i, j, harris_response[i][j]))
+    l = sorted(l, reverse=True, key=lambda a: a[2])
+    filtered_keypoints = [(x, y) for (x, y, z) in l]
+    filtered_keypoints = filtered_keypoints[:n_max_level]
     return filtered_keypoints
 
 
