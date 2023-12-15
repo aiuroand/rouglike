@@ -21,7 +21,7 @@ The provided dataset contains the following attributes:
 """
 
 import pandas as pd
-import numpy
+import numpy as np
 
 
 def load_dataset(train_file_path: str, test_file_path: str) -> pd.DataFrame:
@@ -41,10 +41,15 @@ def load_dataset(train_file_path: str, test_file_path: str) -> pd.DataFrame:
 
     The return value of the function is processed DataFrame.
     """
-
-    # Implement your own solution
-    pass
-
+    Xtrain = pd.read_csv(train_file_path)
+    Xtest = pd.read_csv(test_file_path)
+    Xtrain['Label'] = 'Train'
+    Xtest['Label'] = 'Test'
+    Xmerged = pd.concat([Xtrain, Xtest], axis=0)
+    Xmerged.drop(['Ticket', 'Embarked', 'Cabin'], axis=1, inplace=True)
+    Xmerged['NewIndex'] = list(range(0, Xmerged.shape[0]))
+    Xmerged.set_index('NewIndex', inplace=True)
+    return Xmerged
 
 def get_missing_values(df: pd.DataFrame) -> pd.DataFrame:
     """
@@ -70,9 +75,10 @@ def get_missing_values(df: pd.DataFrame) -> pd.DataFrame:
     "Column1"  |   34.5  |    76.54321
     "Column2"  |   0     |    0
     """
-
-    # Implement your own solution
-    pass
+    missing_df = pd.DataFrame(data={'Total': df.isna().sum(),
+                                    'Percent': df.isna().sum()/df.shape[0]*100})
+    missing_df.sort_values(by='Total', ascending=False, inplace=True)
+    return missing_df
 
 
 def substitute_missing_values(df: pd.DataFrame) -> pd.DataFrame:
@@ -86,9 +92,10 @@ def substitute_missing_values(df: pd.DataFrame) -> pd.DataFrame:
 
     Do not to modify given DataFrame but create a copy of it.
     """
-
-    # Implement your own solution
-    pass
+    new_df = df.copy()
+    new_df['Age'].fillna(df['Age'].mean(), inplace=True)
+    new_df['Fare'].fillna(15, inplace=True)
+    return new_df
 
 
 def get_correlation(df: pd.DataFrame) -> float:
@@ -104,9 +111,7 @@ def get_correlation(df: pd.DataFrame) -> float:
     indicates no linear relationship, -1 indicates strong negative
     relationship, 1 indicates strong relationship.
     """
-
-    # Implement your own solution
-    pass
+    return df[['Age', 'Fare']].corr(method='pearson').iloc[0,1]
 
 
 def get_survived_per_class(df: pd.DataFrame,
@@ -129,9 +134,9 @@ def get_survived_per_class(df: pd.DataFrame,
     Male       |      0.32
 
     """
-
-    # Implement your own solution
-    pass
+    new_df = df.groupby(group_by_column_name)['Survived'].mean().round(2)
+    new_df.sort_values(ascending=False, inplace=True)
+    return new_df
 
 
 def get_outliers(df: pd.DataFrame) -> (int, pd.DataFrame):
@@ -152,9 +157,11 @@ def get_outliers(df: pd.DataFrame) -> (int, pd.DataFrame):
     Return tuple with the number of outliers and all passengers with outlier
     fare ticket price.
     """
-
-    # Implement your own solution
-    pass
+    Q1 = df['Fare'].quantile([0.25]).iloc[0]
+    Q3 = df['Fare'].quantile([0.75]).iloc[0]
+    IQR = Q3 - Q1
+    new_df = df[(df['Fare'] < Q1 - 1.5 * IQR) | (df['Fare'] > Q3 + 1.5 * IQR)]
+    return (new_df.shape[0], new_df)
 
 
 def create_new_features(df: pd.DataFrame) -> pd.DataFrame:
@@ -177,9 +184,13 @@ def create_new_features(df: pd.DataFrame) -> pd.DataFrame:
 
     Do not modify original DataFrame.
     """
-
-    # Implement your own solution
-    pass
+    df_tmp = df.copy()
+    mean = df_tmp['Fare'].mean()
+    div = df_tmp['Fare'].std()
+    df_tmp['Fare_scaled'] = df_tmp['Fare'].apply(lambda x: (x - mean) / div)
+    df_tmp['Age_log'] = df_tmp['Age'].apply(np.log)
+    df_tmp['Sex'] = df_tmp['Sex'].apply(lambda x: 0 if x == 'male' else 1)
+    return df_tmp
 
 
 def determine_survival(df: pd.DataFrame, n_interval: int, age: float,
@@ -208,6 +219,9 @@ def determine_survival(df: pd.DataFrame, n_interval: int, age: float,
     should be 0.21. If there is no passenger for some group, return numpy
     NA value.
     """
-
-    # Implement your own solution
-    pass
+    mean = df['Age'].mean()
+    df['Age'].fillna(mean, inplace=True)
+    df['AgeInterval'] = pd.cut(df['Age'], bins=n_interval)
+    grouped_df = df.groupby(['AgeInterval', 'Sex'], observed=False)
+    result = grouped_df.apply(lambda x: x['Survived'].mean())
+    return result.get((age, sex), default=np.NaN)
