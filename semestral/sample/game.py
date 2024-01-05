@@ -66,7 +66,6 @@ class Game:
                                                                ((j+0.2)*self.size + self.camera[1], (i+0.6)*self.size + self.camera[0]),
                                                               ])
         else:
-            print(i, j)
             pygame.draw.polygon(self.my_screen.screen, color, [((j+0.2*self.size), (i+0.4*self.size)),
                                                                ((j+0.7*self.size), (i+0.4*self.size)),
                                                                ((j+0.7*self.size), (i+0.5*self.size)),
@@ -129,8 +128,6 @@ class Game:
             pygame.draw.rect(self.my_screen.screen, Colors.WHITE.value, rect)
             pygame.draw.rect(self.my_screen.screen, Colors.BLACK.value, rect1)
             if self.keys[k] == True:
-                print(color)
-
                 self.draw_key(self.my_screen.screen.get_size()[1] - self.size * 2 - self.size // 2 + 3 + 15,
                               i + 15,
                               color,
