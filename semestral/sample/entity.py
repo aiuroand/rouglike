@@ -13,5 +13,5 @@ class Entity:
         pass
     
     @abstractmethod
-    def draw(self, screen, rect_size, key_array, camera):
+    def draw(self, screen, rect_size, key_array, win_size):
         pass

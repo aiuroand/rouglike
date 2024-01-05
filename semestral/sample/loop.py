@@ -38,6 +38,8 @@ class Loop:
                 try:
                     game = Game(self.settings[2][0], self.my_screen, self.map)
                     self.status = game.game_loop()
+                    game = None
+                    print(self.status)
                 except WrongPlayersAmount as e:
                     print(e.message)
                     self.status = Status.MENU
