@@ -8,6 +8,7 @@ class Player(Entity):
 
 
     def move(self, map, key_array):
+        difference = (0, 0)
         keys = pygame.key.get_pressed()
         # if keys[pygame.K_w] & keys[pygame.K_d]:
         #     new_pos = (self.pos[0] - self.speed, self.pos[1] + self.speed)
@@ -26,17 +27,29 @@ class Player(Entity):
         elif keys[pygame.K_d]:
             new_pos = (self.pos[0], self.pos[1] + self.speed)
         else:
-            return
+            return (0, 0)
 
+        difference = (self.pos[0] - new_pos[0], self.pos[1] - new_pos[1])
+        
         if map[new_pos[0]][new_pos[1]] == ' ':
             self.pos = new_pos
-        elif map[new_pos[0]][new_pos[1]] == 'R' and key_array[0] == True:
-            self.pos = new_pos
-        elif map[new_pos[0]][new_pos[1]] == 'r':
-            key_array[0] = True
-            map[new_pos[0]][new_pos[1]] = ' '
+            return difference
+        else:
+            for Color, color, key_pos in  [('P', 'p', 0),
+                                           ('B', 'b', 1),
+                                           ('Y', 'y', 2)]:
+                if map[new_pos[0]][new_pos[1]] == Color and key_array[key_pos] == True:
+                   self.pos = new_pos
+                   return difference
+                elif map[new_pos[0]][new_pos[1]] == color:
+                   key_array[key_pos] = True
+                   map[new_pos[0]][new_pos[1]] = ' '
+                   self.pos = new_pos
+                   return difference
+        return (0, 0)
+
+
 
     
-    def draw(self, screen, rect_size):
-        pygame.draw.circle(screen.screen, Colors.GREEN.value, (int(self.pos[1] * rect_size + rect_size // 2),
-                                                               int(self.pos[0] * rect_size + rect_size // 2)), rect_size // 3)
+    def draw(self, screen, rect_size, camera):
+        pygame.draw.circle(screen.screen, Colors.GREEN.value, (500 + rect_size // 2, 400 + rect_size // 2), rect_size // 3)

@@ -1,8 +1,8 @@
 from enumerator import Colors
 from enumerator import Status
+from exceptions import MapAmount
 import pygame 
-import os 
-import sys
+import os
 
 class Levelselecting:
     my_screen = ...
@@ -14,7 +14,7 @@ class Levelselecting:
         self.maps_dir = path
         self.maps = os.listdir(path)
         if len(self.maps) > 10:
-            raise Exception('Wrong amount of maps, check maps directory!')
+            raise MapAmount('Wrong amount of maps, check if maps amount is < 10.')
 
 
     def level_loop(self):
