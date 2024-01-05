@@ -14,10 +14,10 @@ class Menu:
             font = pygame.font.Font(None, 30)
             
             self.my_screen.screen.fill(Colors.BLACK.value)
-            self.my_screen.draw_text("Main menu", font, Colors.WHITE.value, self.my_screen.menu_width // 2, self.my_screen.menu_height // 4)
-            self.my_screen.draw_text("1. Start Game", font, Colors.WHITE.value, self.my_screen.menu_width // 2, self.my_screen.menu_height // 2)
-            self.my_screen.draw_text("2. Rules", font, Colors.WHITE.value, self.my_screen.menu_width // 2, self.my_screen.menu_height // 2 + 50)
-            self.my_screen.draw_text("3. Quit", font, Colors.WHITE.value, self.my_screen.menu_width // 2, self.my_screen.menu_height // 2 + 100)
+            self.my_screen.draw_text("Main menu",     font, Colors.WHITE.value, self.my_screen.width // 2, self.my_screen.height // 4)
+            self.my_screen.draw_text("1. Start Game", font, Colors.WHITE.value, self.my_screen.width // 2, self.my_screen.height // 2)
+            self.my_screen.draw_text("2. Rules",      font, Colors.WHITE.value, self.my_screen.width // 2, self.my_screen.height // 2 + 50)
+            self.my_screen.draw_text("3. Quit",       font, Colors.WHITE.value, self.my_screen.width // 2, self.my_screen.height // 2 + 100)
 
             pygame.display.flip()
 
@@ -26,7 +26,7 @@ class Menu:
                     return Status.EXIT
                 elif event.type == pygame.KEYDOWN:
                     if event.key == pygame.K_1:
-                        return Status.GAME
+                        return Status.LEVEL
                     elif event.key == pygame.K_2:
                         return Status.RULES
                     elif event.key == pygame.K_3:
