@@ -5,6 +5,7 @@ import time
 
 from enumerator import Colors, GameStatus, Status
 from player import Player
+from hvenemies import Vertical, Horizontal
 from exceptions import WrongPlayersAmount
 
 class Game:
@@ -14,8 +15,10 @@ class Game:
     clock = ...
     view_distance = ...
     size = ...
-    camera = ...
+    vector = ...
     FPS = ...
+    player_freq = ...
+    monster_freq = ...
     player = ...
     exit = ...
     game_status = ...
@@ -24,7 +27,6 @@ class Game:
     entities = ...  
     
     def __init__(self, settings_path, screen, map_path):
-        print(self.game_map)
         self.game_map = []
         self.entities = []
         self.keys = [False, False, False]
@@ -40,6 +42,8 @@ class Game:
             self.size = int(next(f))
             self.view_distance = int(next(f))
             self.FPS = int(next(f))
+            self.player_freq  = self.FPS // int(next(f)) 
+            self.monster_freq = self.FPS // int(next(f))
         
         self.height = len(self.game_map)
         self.width = len(self.game_map[0])
@@ -50,20 +54,26 @@ class Game:
                     player += 1
                     self.game_map[i][j] = ' '
                     self.player = Player((i,j), 1, Colors.GREEN.value)
-                    self.camera = ((self.my_screen.screen.get_size()[1] // 2 - i * self.size),
+                    self.vector = ((self.my_screen.screen.get_size()[1] // 2 - i * self.size),
                                    (self.my_screen.screen.get_size()[0] // 2 - j * self.size))
+                elif self.game_map[i][j] == 'V':
+                    self.game_map[i][j] = ' '
+                    self.entities.append(Vertical((i,j), 1, Colors.RED.value))
+                elif self.game_map[i][j] == 'H':
+                    self.game_map[i][j] = ' '
+                    self.entities.append(Horizontal((i,j), 1, Colors.RED.value))
         if player != 1:
             raise WrongPlayersAmount(f'Wrong amount of players on the map. Check if file {map_path} is not damaged.')
   
 
     def draw_key(self, i, j, color, coords=False):
         if not coords:
-            pygame.draw.polygon(self.my_screen.screen, color, [((j+0.2)*self.size + self.camera[1], (i+0.4)*self.size + self.camera[0]),
-                                                               ((j+0.7)*self.size + self.camera[1], (i+0.4)*self.size + self.camera[0]),
-                                                               ((j+0.7)*self.size + self.camera[1], (i+0.5)*self.size + self.camera[0]),
-                                                               ((j+0.4)*self.size + self.camera[1], (i+0.5)*self.size + self.camera[0]),
-                                                               ((j+0.4)*self.size + self.camera[1], (i+0.6)*self.size + self.camera[0]),
-                                                               ((j+0.2)*self.size + self.camera[1], (i+0.6)*self.size + self.camera[0]),
+            pygame.draw.polygon(self.my_screen.screen, color, [((j+0.2)*self.size + self.vector[1], (i+0.4)*self.size + self.vector[0]),
+                                                               ((j+0.7)*self.size + self.vector[1], (i+0.4)*self.size + self.vector[0]),
+                                                               ((j+0.7)*self.size + self.vector[1], (i+0.5)*self.size + self.vector[0]),
+                                                               ((j+0.4)*self.size + self.vector[1], (i+0.5)*self.size + self.vector[0]),
+                                                               ((j+0.4)*self.size + self.vector[1], (i+0.6)*self.size + self.vector[0]),
+                                                               ((j+0.2)*self.size + self.vector[1], (i+0.6)*self.size + self.vector[0]),
                                                               ])
         else:
             pygame.draw.polygon(self.my_screen.screen, color, [((j+0.2*self.size), (i+0.4*self.size)),
@@ -76,16 +86,16 @@ class Game:
     
     
     def draw_door(self, i, j, color):       
-        rect = pygame.Rect(j * self.size + self.camera[1],
-                           i * self.size + self.camera[0], self.size, self.size)
-        rect1 = pygame.Rect((j+0.7) * self.size + self.camera[1],
-                            (i+0.4) * self.size + self.camera[0], self.size // 5, self.size // 5)
+        rect = pygame.Rect(j * self.size + self.vector[1],
+                           i * self.size + self.vector[0], self.size, self.size)
+        rect1 = pygame.Rect((j+0.7) * self.size + self.vector[1],
+                            (i+0.4) * self.size + self.vector[0], self.size // 5, self.size // 5)
         pygame.draw.rect(self.my_screen.screen, color, rect)
         pygame.draw.rect(self.my_screen.screen, Colors.BLACK.value, rect1)
 
-    def camera_update(self, difference):
-        self.camera = (self.camera[0] + difference[0] * self.size,
-                       self.camera[1] + difference[1] * self.size)
+    def vector_update(self, difference):
+        self.vector = (self.vector[0] + difference[0] * self.size,
+                       self.vector[1] + difference[1] * self.size)
 
 
     def draw_map(self):
@@ -95,10 +105,8 @@ class Game:
                 distance = math.sqrt((self.player.pos[0] - i) ** 2 + (self.player.pos[1] - j) ** 2)
                 if distance <= self.view_distance:
                     
-                    rect = pygame.Rect(j * self.size + self.camera[1],
-                                       i * self.size + self.camera[0], self.size, self.size)
-                    rect1 = pygame.Rect((j+0.7) * self.size + self.camera[1],
-                                        (i+0.4) * self.size + self.camera[0], self.size // 5, self.size // 5)
+                    rect = pygame.Rect(j * self.size + self.vector[1],
+                                       i * self.size + self.vector[0], self.size, self.size)
                     
                     if symb == '#':
                         pygame.draw.rect(self.my_screen.screen, Colors.WHITE.value, rect)
@@ -145,6 +153,7 @@ class Game:
             time.sleep(3)
             return Status.MENU
         elif self.game_status == GameStatus.LOSE:
+            time.sleep(2)
             self.my_screen.screen.fill(Colors.BLACK.value)
             self.my_screen.draw_text("You lost :( Better luck next time!", pygame.font.Font(None, 60), Colors.WHITE.value, self.my_screen.width // 2, self.my_screen.height // 2)
             pygame.display.flip()
@@ -153,7 +162,9 @@ class Game:
 
 
     def game_loop(self):
+        counter = 0
         while self.game_status == GameStatus.PROCESSING:
+            counter = (counter + 1) % self.FPS
             for event in pygame.event.get():
                 if event.type == pygame.QUIT:
                     pygame.quit()
@@ -162,21 +173,34 @@ class Game:
             self.my_screen.screen.fill(Colors.BLACK.value)
             self.draw_map()
             self.draw_inventory()
-
-            self.game_status, difference = self.player.move(self.game_map, self.keys)
-            self.camera_update(difference)
-            self.player.draw(self.my_screen, self.size, self.my_screen.screen.get_size())
             
-                # for entity in self.entities:
-                #     difference = entity.move(self.game_map, self.keys)
-                #     self.camera_update(difference)
-                #     entity.draw(self.my_screen, self.size, self.camera)
+            if counter % self.player_freq == 1: 
+                self.game_status, difference = self.player.move(self.game_map, self.keys)
+                self.vector_update(difference)
+                for enemy in self.entities:
+                    if self.player.pos == enemy.pos:
+                        self.game_status = GameStatus.LOSE
+                        break
+
+            if self.game_status == GameStatus.PROCESSING and counter % self.monster_freq == 1:
+                for entity in self.entities:
+                    game_status = entity.move(self.game_map, self.player.pos)
+                    if game_status == GameStatus.LOSE:
+                        self.game_status = GameStatus.LOSE
+                        break
+            
+            self.player.draw(self.my_screen, self.size, self.my_screen.screen.get_size())
+            for entity in self.entities:
+                entity.draw(self.my_screen, self.size, self.vector)
+            
             pygame.display.flip()
             self.clock.tick(self.FPS)
 
         self.my_screen.screen.fill(Colors.BLACK.value)
         self.draw_map()
         self.player.draw(self.my_screen, self.size, self.my_screen.screen.get_size())
+        for entity in self.entities:
+            entity.draw(self.my_screen, self.size, self.vector)
         pygame.display.flip()
         self.clock.tick(self.FPS)
         return self.end_game()

@@ -1,4 +1,5 @@
 from abc import abstractmethod
+
 class Entity:
     pos = ...
     speed = ...
@@ -8,10 +9,17 @@ class Entity:
         self.speed = speed
         self.color = color
 
+
+class Enemy(Entity):
+    def __init__ (self, pos, speed, color):
+        Entity.__init__(self, pos, speed, color)
+
+
     @abstractmethod
-    def move(self):
+    def move(self, map, player_coords):
         pass
-    
+
+
     @abstractmethod
-    def draw(self, screen, rect_size, key_array, win_size):
+    def draw(self, screen, rect_size, vector):
         pass

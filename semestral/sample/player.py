@@ -10,14 +10,6 @@ class Player(Entity):
     def move(self, map, key_array):
         difference = (0, 0)
         keys = pygame.key.get_pressed()
-        # if keys[pygame.K_w] & keys[pygame.K_d]:
-        #     new_pos = (self.pos[0] - self.speed, self.pos[1] + self.speed)
-        # elif keys[pygame.K_w] & keys[pygame.K_a]:
-        #     new_pos = (self.pos[0] - self.speed, self.pos[1] - self.speed)
-        # elif keys[pygame.K_s] & keys[pygame.K_d]:
-        #     new_pos = (self.pos[0] + self.speed, self.pos[1] + self.speed)
-        # elif keys[pygame.K_s] & keys[pygame.K_a]:
-        #     new_pos = (self.pos[0] + self.speed, self.pos[1] - self.speed)
         if keys[pygame.K_w]:
             new_pos = (self.pos[0] - self.speed, self.pos[1])
         elif keys[pygame.K_s]:
@@ -55,4 +47,8 @@ class Player(Entity):
 
     
     def draw(self, screen, rect_size, win_size):
-        pygame.draw.circle(screen.screen, Colors.GREEN.value, (win_size[0] // 2 + rect_size // 2, win_size[1] // 2 + rect_size // 2), rect_size // 3)
+        pygame.draw.circle(screen.screen,
+                           self.color,
+                           (win_size[0] // 2 + rect_size // 2,
+                            win_size[1] // 2 + rect_size // 2),
+                           rect_size // 3)
