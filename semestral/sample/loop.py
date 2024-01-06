@@ -1,10 +1,15 @@
+""" Represnting loop, that connects menu, game, rules, maps """
+
+
+import sys
+
 from menu import Menu
 from window import Window
 from game import Game
 from levelselecting import Levelselecting
 from enumerator import Status
 from exceptions import WrongPlayersAmount, MapAmount
-import sys
+
 
 class Loop:
     status = ...
@@ -13,11 +18,11 @@ class Loop:
     menu = ...
     level = ...
     map = ...
-    
+
     def __init__(self, settings_path):
         with open(settings_path, 'r') as f:
             self.settings = [line.rsplit() for line in f]
-        self.status = Status.MENU 
+        self.status = Status.MENU
         self.my_screen = Window(self.settings[0][0])
         self.menu = Menu(self.my_screen)
         try:
@@ -27,7 +32,6 @@ class Loop:
             sys.exit()
         self.map = None
 
-    
     def loop(self):
         while True:
             if self.status == Status.MENU:
@@ -47,5 +51,3 @@ class Loop:
                 sys.exit()
             elif self.status == Status.EXIT:
                 sys.exit()
-                
-            

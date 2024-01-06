@@ -1,24 +1,26 @@
+""" File that contains main menu representation. """
+
+
 from enumerator import Status
 from enumerator import Colors
 import pygame
 
+
 class Menu:
     my_screen = ...
-    
+
     def __init__(self, my_screen):
         self.my_screen = my_screen
-    
-    
+
     def menu_loop(self):
-        while True:            
+        while True:
             font = pygame.font.Font(None, 30)
-            
+
             self.my_screen.screen.fill(Colors.BLACK.value)
             self.my_screen.draw_text("Main menu",     font, Colors.WHITE.value, self.my_screen.width // 2, self.my_screen.height // 4)
             self.my_screen.draw_text("1. Start Game", font, Colors.WHITE.value, self.my_screen.width // 2, self.my_screen.height // 2)
             self.my_screen.draw_text("2. Rules",      font, Colors.WHITE.value, self.my_screen.width // 2, self.my_screen.height // 2 + 50)
             self.my_screen.draw_text("3. Quit",       font, Colors.WHITE.value, self.my_screen.width // 2, self.my_screen.height // 2 + 100)
-
             pygame.display.flip()
 
             for event in pygame.event.get():

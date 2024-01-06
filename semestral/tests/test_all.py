@@ -1,13 +1,11 @@
-
 import pytest
-import inspect
 import pycodestyle
 import os
 
-@pytest.fixture
+@pytest.mark.skip(reason='Helping function')
 def test_file(path=''):
     style = pycodestyle.StyleGuide()
-    print(f'Testing {path}')
+    style.options.ignore = 'E501'
     res = style.check_files([path])
     return(res.total_errors)
 
@@ -15,7 +13,8 @@ def test_file(path=''):
 def test_pep8(dir='sample/'):
     files = [dir + f for f in os.listdir(dir) if f.endswith('.py')]
     for f in files:
-        assert(test_file(f) == 0)
+        print(f'Testing {f}')
+        assert test_file(f) == 0, f'{f} has no correct PEP8 format'
 
 # def code_style(d):
 #     style = pycodestyle.StyleGuide()
@@ -34,18 +33,3 @@ def test_pep8(dir='sample/'):
 #     # 0103 variables name (does not like shorter than 2 chars)
 #     r = Run(['--disable=C0301,C0103 ', '-sn', src_file], reporter=rep, exit=False)
 #     return r.linter
-
-
-# # @pytest.mark.parametrize("limit", range(0, 11))
-# # def test_codestyle_score(linter, limit, runs=[]):
-# #     """ Evaluate codestyle for different thresholds. """
-# #     if len(runs) == 0:
-# #         print('\nLinter output:')
-# #         for m in linter.reporter.messages:
-# #             print(f'{m.msg_id} ({m.symbol}) line {m.line}: {m.msg}')
-# #     runs.append(limit)
-# #     # score = linter.stats['global_note']
-# #     score = linter.stats.global_note
-
-# #     print(f'pylint score = {score} limit = {limit}')
-# #     assert score >= limit

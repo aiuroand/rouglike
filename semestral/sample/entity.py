@@ -1,9 +1,14 @@
+""" File that contains abstract class for entities and enemies. """
+
+
 from abc import abstractmethod
+
 
 class Entity:
     pos = ...
     speed = ...
     color = ...
+
     def __init__(self, pos, speed, color):
         self.pos = pos
         self.speed = speed
@@ -11,14 +16,12 @@ class Entity:
 
 
 class Enemy(Entity):
-    def __init__ (self, pos, speed, color):
+    def __init__(self, pos, speed, color):
         Entity.__init__(self, pos, speed, color)
-
 
     @abstractmethod
     def move(self, map, player_coords):
         pass
-
 
     @abstractmethod
     def draw(self, screen, rect_size, vector):
