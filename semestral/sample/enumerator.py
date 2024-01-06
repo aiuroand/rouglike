@@ -28,3 +28,6 @@ class GameStatus(Enum):
     WIN = 2
     LOSE = 3
     EXIT = 0
+
+
+assert (__name__ != "__main__")

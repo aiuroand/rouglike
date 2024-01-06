@@ -8,7 +8,7 @@ import time
 
 from enumerator import Colors, GameStatus, Status
 from player import Player
-from hvenemies import Vertical, Horizontal
+from enemies import Vertical, Horizontal, Follower
 from exceptions import WrongPlayersAmount
 
 
@@ -39,7 +39,7 @@ class Game:
         self.clock = pygame.time.Clock()
         with open(map_path, 'r') as f:
             for line in f.readlines():
-                row = [line for i in l][:-1]
+                row = [i for i in line][:-1]
                 self.game_map.append(row)
 
         with open(settings_path, 'r') as f:
@@ -66,6 +66,9 @@ class Game:
                 elif self.game_map[i][j] == 'H':
                     self.game_map[i][j] = ' '
                     self.entities.append(Horizontal((i, j), 1, Colors.RED.value))
+                elif self.game_map[i][j] == 'R':
+                    self.game_map[i][j] = ' '
+                    self.entities.append(Follower((i, j), 1, Colors.RED.value))
         if player != 1:
             raise WrongPlayersAmount(f'Wrong amount of players on the map. Check if file {map_path} is not damaged.')
 
@@ -135,12 +138,13 @@ class Game:
                                 self.size * 2 - 6, self.size * 2 - 6)
             pygame.draw.rect(self.my_screen.screen, Colors.WHITE.value, rect)
             pygame.draw.rect(self.my_screen.screen, Colors.BLACK.value, rect1)
-            if self.keys[k]:
+            
+            if self.keys[k] == True:
                 self.draw_key(self.my_screen.screen.get_size()[1] - self.size * 2 - self.size // 2 + 3 + 15,
                               i + 15,
                               color,
                               True)
-                k += 1
+            k += 1
 
     def end_game(self):
         if self.game_status == GameStatus.EXIT:
@@ -189,7 +193,7 @@ class Game:
 
             self.player.draw(self.my_screen, self.size, self.my_screen.screen.get_size())
             for entity in self.entities:
-                entity.draw(self.my_screen, self.size, self.vector)
+                entity.draw(self.my_screen, self.size, self.vector, self.player.pos, self.view_distance)
 
             pygame.display.flip()
             self.clock.tick(self.FPS)
@@ -198,7 +202,10 @@ class Game:
         self.draw_map()
         self.player.draw(self.my_screen, self.size, self.my_screen.screen.get_size())
         for entity in self.entities:
-            entity.draw(self.my_screen, self.size, self.vector)
+            entity.draw(self.my_screen, self.size, self.vector, self.player.pos, self.view_distance)
         pygame.display.flip()
         self.clock.tick(self.FPS)
         return self.end_game()
+
+
+assert (__name__ != "__main__")

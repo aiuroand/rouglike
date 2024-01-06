@@ -54,3 +54,6 @@ class Player(Entity):
                            (win_size[0] // 2 + rect_size // 2,
                             win_size[1] // 2 + rect_size // 2),
                            rect_size // 3)
+
+
+assert (__name__ != "__main__")

@@ -49,3 +49,6 @@ class Levelselecting:
                 elif event.type == pygame.KEYDOWN:
                     if event.key in key_list:
                         return (Status.GAME, d[event.key])
+
+
+assert (__name__ != "__main__")

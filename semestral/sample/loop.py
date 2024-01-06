@@ -51,3 +51,6 @@ class Loop:
                 sys.exit()
             elif self.status == Status.EXIT:
                 sys.exit()
+
+
+assert (__name__ != "__main__")

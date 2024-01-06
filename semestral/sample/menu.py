@@ -33,3 +33,6 @@ class Menu:
                         return Status.RULES
                     elif event.key == pygame.K_3:
                         return Status.EXIT
+
+
+assert (__name__ != "__main__")
