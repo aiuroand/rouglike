@@ -63,7 +63,7 @@ class Player(Entity):
                     self.pos = new_pos
                     game_map[new_pos[0]][new_pos[1]] = ' '
                     return (GameStatus.PROCESSING, difference)
-                elif map[new_pos[0]][new_pos[1]] == color:
+                elif game_map[new_pos[0]][new_pos[1]] == color:
                     key_array[key_pos] = True
                     game_map[new_pos[0]][new_pos[1]] = ' '
                     self.pos = new_pos
