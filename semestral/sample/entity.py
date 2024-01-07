@@ -6,6 +6,7 @@ import math
 
 from abc import abstractmethod
 
+
 class Entity:
     pos = ...
     speed = ...
@@ -33,7 +34,6 @@ class Enemy(Entity):
                                (self.pos[1] * rect_size + rect_size // 2 + vector[1],
                                 self.pos[0] * rect_size + rect_size // 2 + vector[0]),
                                rect_size // 3)
-
 
 
 assert (__name__ != "__main__")

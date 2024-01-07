@@ -3,7 +3,7 @@
 
 
 from queue import PriorityQueue
-import os
+
 
 def calculate_manhattan(cell1, cell2):
     return abs(cell1[0] - cell2[0]) + abs(cell1[1] - cell2[1])
@@ -18,8 +18,8 @@ def a_star(game_map, start, finish):
         g_score.append([])
         f_score.append([])
         for j in range(width):
-            g_score[i].append(float('inf')) 
-            f_score[i].append(float('inf')) 
+            g_score[i].append(float('inf'))
+            f_score[i].append(float('inf'))
     g_score[start[0]][start[1]] = 0
     f_score[start[0]][start[1]] = calculate_manhattan(start, (1, 8))
 
@@ -37,14 +37,14 @@ def a_star(game_map, start, finish):
             break
         for d in 'ESNW':
             if d == 'E':
-                child_cell=(curr_cell[0], curr_cell[1]+1)
+                child_cell = (curr_cell[0], curr_cell[1] + 1)
             elif d == 'W':
-                child_cell=(curr_cell[0], curr_cell[1]-1)
+                child_cell = (curr_cell[0], curr_cell[1] - 1)
             elif d == 'N':
-                child_cell=(curr_cell[0]-1, curr_cell[1])
+                child_cell = (curr_cell[0] - 1, curr_cell[1])
             else:
-                child_cell=(curr_cell[0]+1, curr_cell[1])
-                
+                child_cell = (curr_cell[0] + 1, curr_cell[1])
+
             if game_map[child_cell[0]][child_cell[1]] == ' ':
                 temp_g_score = g_score[curr_cell[0]][curr_cell[1]] + 1
                 temp_f_score = temp_g_score + calculate_manhattan(child_cell, finish)
@@ -55,18 +55,12 @@ def a_star(game_map, start, finish):
                     aPath[child_cell] = curr_cell
     if not found:
         return []
-    fwd_path=[]
-    cell=finish
+    fwd_path = []
+    cell = finish
     while cell != start:
         fwd_path.append(aPath[cell])
         cell = aPath[cell]
     return fwd_path[::-1] + [finish]
 
-# game_map = []
-# map_path = os.path.relpath('maps/noway.txt')
-# with open(map_path, 'r') as f:
-#     for line in f.readlines():
-#         row = [i for i in line][:-1]
-#         game_map.append(row)
-# print(game_map)
-# print(a_star(game_map, (1, 1), (1, 8)))
+
+assert (__name__ != "__main__")

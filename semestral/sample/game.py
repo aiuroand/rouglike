@@ -9,7 +9,7 @@ import time
 from enumerator import Colors, GameStatus, Status
 from player import Player
 from enemies import Vertical, Horizontal, Follower
-from exceptions import WrongPlayersAmount
+from exceptions import WrongPlayersAmount, WrongMapSize
 
 
 class Game:
@@ -42,6 +42,8 @@ class Game:
                 row = [i for i in line][:-1]
                 self.game_map.append(row)
 
+        self.check_map(map_path)
+
         with open(settings_path, 'r') as f:
             self.size = int(next(f))
             self.view_distance = int(next(f))
@@ -55,7 +57,6 @@ class Game:
         for i in range(self.height):
             for j in range(self.width):
                 if self.game_map[i][j] == '@':
-                    player += 1
                     self.game_map[i][j] = ' '
                     self.player = Player((i, j), 1, Colors.GREEN.value)
                     self.vector = ((self.my_screen.screen.get_size()[1] // 2 - i * self.size),
@@ -69,9 +70,39 @@ class Game:
                 elif self.game_map[i][j] == 'R':
                     self.game_map[i][j] = ' '
                     self.entities.append(Follower((i, j), 1, Colors.RED.value))
-        if player != 1:
-            raise WrongPlayersAmount(f'Wrong amount of players on the map. Check if file {map_path} is not damaged.')
 
+
+    def check_map(self, game_map, path):
+        height = len(game_map)
+        assert height > 0, f'It is impossible for map to have height 0. Check if {path} was damaged.'
+        
+        width = len(self.game_map[0])
+        assert height > 3 and width > 3, f'It is impossible for map to have height <= 3. Check if {path} was damaged.'
+        
+        for i in range(height):
+            assert len(self.game_map[i]) == width, f'Map does not have rectangle shape. Check if {path} was damaged.'
+        
+        for j in range(width):
+            assert self.game_map[0][j] == '#' and self.game_map[height - 1][j] == '#', f'Borders are not filled with \'#\'. Check if {path} was damaged.'
+
+        for i in range(height):
+            assert self.game_map[i][0] == '#' and self.game_map[i][width - 1] == '#', f'Borders are not filled with \'#\'. Check if {path} was damaged.'
+        
+        p_cnt = 0
+        e_cnt = 0
+        allowed_s = [[' ', '#', 'b', 'y', 'p', 'B', 'Y', 'P', 'H', 'V', 'R']]
+        for i in range(height):
+            for j in range(width):
+                if self.game_map[i][j] == '@':
+                    p_cnt += 1
+                elif self.game_map[i][j] == 'E':
+                    e_cnt += 1
+                else:
+                    assert self.game_map[i][j] in allowed_s, f'Unexpected symbol {self.game_map[i][j]} on position ({i + 1},{j + 1}).
+                                                               Check if {path} was damaged.'
+        assert p_cnt == 1, f'Wrong amount of players: {p_cnt}. Check if {path} was damaged.'
+        assert e_cnt != 0, f'Wrong amount of exits: {e_cnt}. Check if {path} was damaged.'        
+    
     def draw_key(self, i, j, color, coords=False):
         if not coords:
             pygame.draw.polygon(self.my_screen.screen, color, [((j + 0.2) * self.size + self.vector[1], (i + 0.4) * self.size + self.vector[0]),
@@ -138,8 +169,8 @@ class Game:
                                 self.size * 2 - 6, self.size * 2 - 6)
             pygame.draw.rect(self.my_screen.screen, Colors.WHITE.value, rect)
             pygame.draw.rect(self.my_screen.screen, Colors.BLACK.value, rect1)
-            
-            if self.keys[k] == True:
+
+            if self.keys[k]:
                 self.draw_key(self.my_screen.screen.get_size()[1] - self.size * 2 - self.size // 2 + 3 + 15,
                               i + 15,
                               color,

@@ -33,13 +33,13 @@ class Levelselecting:
                                          font,
                                          Colors.WHITE.value,
                                          self.my_screen.width // 2,
-                                         self.my_screen.height // 2 + i * 50)
+                                         self.my_screen.height // 2 - 200 + i * 50)
                 i += 1
 
             pygame.display.flip()
 
             d = {}
-            key_list = [pygame.K_1, pygame.K_2, pygame.K_3, pygame.K_4, pygame.K_5, pygame.K_6, pygame.K_7, pygame.K_8, pygame.K_9][0:i - 1]
+            key_list = [pygame.K_1, pygame.K_2, pygame.K_3, pygame.K_4, pygame.K_5, pygame.K_6, pygame.K_7, pygame.K_8, pygame.K_9, pygame.K_0][0:i - 1]
             for j in range(i - 1):
                 d[key_list[j]] = self.maps_dir + self.maps[j]
 

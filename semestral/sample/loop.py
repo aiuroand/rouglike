@@ -6,6 +6,7 @@ import sys
 from menu import Menu
 from window import Window
 from game import Game
+from rules import Rules
 from levelselecting import Levelselecting
 from enumerator import Status
 from exceptions import WrongPlayersAmount, MapAmount
@@ -17,6 +18,7 @@ class Loop:
     settings = ...
     menu = ...
     level = ...
+    rules = ...
     map = ...
 
     def __init__(self, settings_path):
@@ -25,6 +27,7 @@ class Loop:
         self.status = Status.MENU
         self.my_screen = Window(self.settings[0][0])
         self.menu = Menu(self.my_screen)
+        self.rules = Rules(self.my_screen)
         try:
             self.level = Levelselecting(self.my_screen, self.settings[1][0])
         except MapAmount as e:
@@ -47,8 +50,11 @@ class Loop:
                 except WrongPlayersAmount as e:
                     print(e.message)
                     self.status = Status.MENU
+                except AssertionError as e:
+                    print(e.args[0])
+                    self.status = Status.MENU
             elif self.status == Status.RULES:
-                sys.exit()
+                self.status = self.rules.rules_loop()
             elif self.status == Status.EXIT:
                 sys.exit()
 
