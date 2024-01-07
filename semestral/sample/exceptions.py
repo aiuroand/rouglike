@@ -1,18 +1,15 @@
 """ File that contains all user-made exceptions """
 
 
-class WrongPlayersAmount(Exception):
-    def __init__(self, str):
-        self.message = str
-
-
 class MapAmount(Exception):
-    def __init__(self, str):
-        self.message = str
+    """Exception that is raised if maps directory has wrong amount of maps.
+    """
+    def __init__(self, str: str):
+        """Constructor
 
-  
-class WrongMapSize(Exception):
-    def __init__(self, str):
+        Args:
+            str (str): Exception message
+        """
         self.message = str
 
 

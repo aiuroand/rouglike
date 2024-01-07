@@ -5,6 +5,8 @@ from enum import Enum
 
 
 class Status(Enum):
+    """Enumerator for menu status.
+    """
     MENU = 1
     LEVEL = 2
     GAME = 3
@@ -13,6 +15,8 @@ class Status(Enum):
 
 
 class Colors(Enum):
+    """Enumerator for all avialable colors.
+    """
     BLACK = (0, 0, 0)
     WHITE = (255, 255, 255)
     GREEN = (0, 255, 0)
@@ -24,6 +28,8 @@ class Colors(Enum):
 
 
 class GameStatus(Enum):
+    """Enumerator for current game status.
+    """
     PROCESSING = 1
     WIN = 2
     LOSE = 3

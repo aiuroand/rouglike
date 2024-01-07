@@ -1,18 +1,37 @@
 """ File that contains main menu representation. """
 
 
+import pygame
+
+from window import Window
 from enumerator import Status
 from enumerator import Colors
-import pygame
 
 
 class Menu:
-    my_screen = ...
+    """Class that represents main menu.
 
-    def __init__(self, my_screen):
+    Arguments:
+        my_screen (Window): user-created wrapper for pygame.display.
+    """
+    my_screen: Window
+
+    def __init__(self, my_screen: Window):
+        """Constructor
+
+        Args:
+            my_screen (Window): user-created wrapper for pygame.display.
+        """
         self.my_screen = my_screen
 
-    def menu_loop(self):
+    def menu_loop(self) -> Status:
+        """Main menu loop.
+
+        Returns:
+            Status: Status.LEVEL if user selects Start Game.
+                    Status.RULES if user selects Rules.
+                    Status.QUIT if user selects Quit ot closes the window.
+        """
         while True:
             font = pygame.font.Font(None, 30)
 

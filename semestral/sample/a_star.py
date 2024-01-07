@@ -5,20 +5,31 @@
 from queue import PriorityQueue
 
 
-def calculate_manhattan(cell1: tuple, cell2: tuple):
-    """ Returns manhattan distance between 2 2d points.
+def calculate_manhattan(cell1: tuple = (0, 0), cell2: tuple = (0, 0)) -> int:
+    """Calculates manhattan distance between 2 points in 2D
 
     Args:
-        cell1 (_type_): _description_
-        cell2 (_type_): _description_
+        cell1 (tuple, optional): cordinates of 1st point. Defaults to (0, 0)
+        cell2 (tuple, optional): coordinates of 2nd point. Defaults to (0, 0)
 
     Returns:
-        _type_: _description_
+        int: manhattan distance
     """
     return abs(cell1[0] - cell2[0]) + abs(cell1[1] - cell2[1])
 
 
-def a_star(game_map, start, finish):
+def a_star(game_map: list, start: tuple, finish: tuple) -> list:
+    """Calculates shortest path from 'start' to 'finist' points in 2D maze uisng A* algorithm.
+
+    Args:
+        game_map (list): 2D list that represents maze. All free cells should be filled with ' '.
+        start (tuple): Starting point.
+        finish (tuple): Finish point.
+
+    Returns:
+        list: Array of tuples, that represents the best route.
+    """
+
     height = len(game_map)
     width = len(game_map[0])
     g_score = []

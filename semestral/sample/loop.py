@@ -9,19 +9,35 @@ from game import Game
 from rules import Rules
 from levelselecting import Levelselecting
 from enumerator import Status
-from exceptions import WrongPlayersAmount, MapAmount
+from exceptions import MapAmount
 
 
 class Loop:
-    status = ...
-    my_screen = ...
-    settings = ...
-    menu = ...
-    level = ...
-    rules = ...
-    map = ...
+    """Main loop, that connects all game parts.
 
-    def __init__(self, settings_path):
+    Arguments:
+        status (Status): enumerator that represents current program status.
+        my_screen (Window): user-made wrapper for pygame.display.
+        settings (list): list that contains paths to configurtation files.
+        menu (Menu): object, that represents main game menu.
+        level (Levelselecting): object, that represents level selecting menu.
+        rules (Rules): object, that represents rules.
+        chosen_map (str): path, that is choosen in level selecting phase.
+    """
+    status: Status
+    my_screen: Window
+    settings: list
+    menu: Menu
+    level: Levelselecting
+    rules: Rules
+    chosen_map: str
+
+    def __init__(self, settings_path: str) -> None:
+        """Constuctor
+
+        Args:
+            settings_path (str): path to main configuration files.
+        """
         with open(settings_path, 'r') as f:
             self.settings = [line.rsplit() for line in f]
         self.status = Status.MENU
@@ -33,23 +49,22 @@ class Loop:
         except MapAmount as e:
             print(e)
             sys.exit()
-        self.map = None
+        self.chosen_map = None
 
-    def loop(self):
+    def loop(self) -> None:
+        """Main loop that connects all game parts together.
+        """
         while True:
             if self.status == Status.MENU:
                 self.status = self.menu.menu_loop()
             elif self.status == Status.LEVEL:
-                self.status, self.map = self.level.level_loop()
+                self.status, self.chosen_map = self.level.level_loop()
             elif self.status == Status.GAME:
                 try:
-                    game = Game(self.settings[2][0], self.my_screen, self.map)
+                    game = Game(self.settings[2][0], self.my_screen, self.chosen_map)
                     self.status = game.game_loop()
                     game = None
                     print(self.status)
-                except WrongPlayersAmount as e:
-                    print(e.message)
-                    self.status = Status.MENU
                 except AssertionError as e:
                     print(e.args[0])
                     self.status = Status.MENU

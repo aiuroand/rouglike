@@ -3,24 +3,47 @@
 
 import pygame
 import os
+from window import Window
 from enumerator import Colors
 from enumerator import Status
 from exceptions import MapAmount
 
 
 class Levelselecting:
-    my_screen = ...
-    maps_dir = ...
-    maps = ...
+    """Class that represents map selecting menu.
 
-    def __init__(self, screen, path):
+    Arguments:
+        my_screen (Window): user-created wrapper for pygame.display.
+        maps_dir (str): directory that contains all valid gmae maps.
+        maps (list): all maps' paths of maps in maps_dir.
+    """
+    my_screen: Window
+    maps_dir: str
+    maps: list
+
+    def __init__(self, screen: Window, path: str):
+        """Constructor
+
+        Args:
+            screen (Window): user-made wrapper for pygame.display.
+            path (str): directory that contains maps.
+
+        Raises:
+            MapAmount: if amount of maps in directory path > 10.
+.z        """
         self.my_screen = screen
         self.maps_dir = path
         self.maps = os.listdir(path)
         if len(self.maps) > 10:
             raise MapAmount('Wrong amount of maps, check if maps amount is < 10.')
 
-    def level_loop(self):
+    def level_loop(self) -> Status:
+        """Loop that allows map selection.
+
+        Returns:
+            Status: (Status.EXIT, None) if user decides to leave the game.
+                    (Status.GAME, path) if user chose the map.
+        """
         while True:
             font = pygame.font.Font(None, 30)
 

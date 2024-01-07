@@ -1,18 +1,32 @@
 """ File that contains rules window representation. """
 
 
-from enumerator import Status
-from enumerator import Colors
 import pygame
+
+from enumerator import Status, Colors
+from window import Window
 
 
 class Rules:
-    my_screen = ...
+    """Class that represents game rules.
 
-    def __init__(self, my_screen):
+    Arguments:
+        my_screen (Window): user-created wrapper for pygame.display.
+    """
+    my_screen: Window
+
+    def __init__(self, my_screen: Window):
+        """Constructor
+        """
         self.my_screen = my_screen
 
-    def rules_loop(self):
+    def rules_loop(self) -> Status:
+        """Loop rules that prints all information about the gameplay.
+
+        Returns:
+            Status: Status.MENU if user press 'escape' button.
+                    Status.EXIT if user closed te window.
+        """
         while True:
             font = pygame.font.Font(None, 30)
 
@@ -21,16 +35,16 @@ class Rules:
             self.my_screen.draw_text("Welcome to my maze game",
                                      font, Colors.WHITE.value,
                                      self.my_screen.width // 2, self.my_screen.height // 4)
-            
+
             # 1.
-            self.my_screen.draw_text("1. This is you     ", 
+            self.my_screen.draw_text("1. This is you     ",
                                      font, Colors.WHITE.value,
                                      self.my_screen.width // 2, self.my_screen.height // 2 - 70)
             pygame.draw.circle(self.my_screen.screen,
                                Colors.GREEN.value,
                                (self.my_screen.width // 2 + 70, self.my_screen.height // 2 - 70),
-                                30 // 3)
-            
+                               30 // 3)
+
             # 2.
             for i, letter in [(self.my_screen.width // 2, 'A'),
                               (self.my_screen.width // 2 + 26, 'S'),
@@ -54,9 +68,9 @@ class Rules:
             pygame.draw.rect(self.my_screen.screen, Colors.BLACK.value, rect1)
             self.my_screen.draw_text('W', font, Colors.WHITE.value, self.my_screen.width // 2 + 26 + 38, self.my_screen.height // 2 - 24)
             self.my_screen.draw_text("2. You can move using                buttons.", font, Colors.WHITE.value, self.my_screen.width // 2, self.my_screen.height // 2)
-            
+
             # 3.
-            self.my_screen.draw_text("3. You can collect keys               ", 
+            self.my_screen.draw_text("3. You can collect keys               ",
                                      font, Colors.WHITE.value,
                                      self.my_screen.width // 2, self.my_screen.height // 2 + 70)
             for j, color in [(self.my_screen.width // 2 + 80, Colors.BLUE.value),
@@ -69,7 +83,7 @@ class Rules:
                                                                    ((j + 0.4 * 30), (self.my_screen.height // 2 + 55 + 0.6 * 30)),
                                                                    ((j + 0.2 * 30), (self.my_screen.height // 2 + 55 + 0.6 * 30))]
                                     )
-            self.my_screen.draw_text("to open doors               ", 
+            self.my_screen.draw_text("to open doors               ",
                                      font, Colors.WHITE.value,
                                      self.my_screen.width // 2, self.my_screen.height // 2 + 100)
             for j, color in [(self.my_screen.width // 2 + 63, Colors.BLUE.value),
@@ -91,16 +105,18 @@ class Rules:
             pygame.draw.circle(self.my_screen.screen,
                                Colors.RED.value,
                                (self.my_screen.width // 2 + 70 - 230, self.my_screen.height // 2 + 170),
-                                30 // 3)
+                               30 // 3)
             # 6.
             self.my_screen.draw_text("I wish you Good Luck! :)",
                                      font, Colors.WHITE.value,
                                      self.my_screen.width // 2, self.my_screen.height // 2 + 240)
-            
+
             pygame.display.flip()
 
             for event in pygame.event.get():
-                if event.type == pygame.QUIT or (event.type == pygame.KEYDOWN and event.key == pygame.K_ESCAPE):
+                if event.type == pygame.QUIT:
+                    return Status.EXIT
+                elif event.type == pygame.KEYDOWN and event.key == pygame.K_ESCAPE:
                     return Status.MENU
 
 

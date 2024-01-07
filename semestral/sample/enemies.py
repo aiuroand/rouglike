@@ -1,29 +1,49 @@
 """ File that contains classes, that represent enemies. """
 
 
-import pygame
-
 from entity import Enemy
-from enumerator import GameStatus
+from enumerator import GameStatus, Colors
 from a_star import a_star
 
+
 class Vertical(Enemy):
-    up = ...
+    """ Class that inherits from abstract class Enemy.
 
-    def __init__(self, pos, speed, color):
-        Enemy.__init__(self, pos, speed, color)
-        self.up = True
+    Represents up-down wakling enemy.
 
-    def move(self, map, player_coords):
+    Attributes:
+        up (bool): current direction of mevement.
+    """
+    up: bool = True
+
+    def __init__(self, pos: tuple, color: tuple):
+        """ Constructor that firstly creates parren class Enemy.
+
+        Args:
+            pos (tuple): Enemy position.
+            color (Colors): Enemy color in RGB format.
+        """
+        Enemy.__init__(self, pos, color)
+
+    def move(self, game_map: list, player_coords: tuple) -> GameStatus:
+        """ Enemy makes 1 step above or 1 step below.
+
+        Args:
+            game_map (list): 2D array that represents game map.
+            player_coords (tuple): Current coordinates of a player to detect possible collision.
+
+        Returns:
+            GameStatus: Enumerator, that show is emeny killed player or not.
+        """
         if self.up:
-            new_pos = (self.pos[0] - self.speed, self.pos[1])
+            new_pos = (self.pos[0] - 1, self.pos[1])
         else:
-            new_pos = (self.pos[0] + self.speed, self.pos[1])
+            new_pos = (self.pos[0] + 1, self.pos[1])
 
         if new_pos == player_coords:
             self.pos = new_pos
             return GameStatus.LOSE
-        elif map[new_pos[0]][new_pos[1]] == ' ':
+        elif game_map[new_pos[0]][new_pos[1]] == ' ':
             self.pos = new_pos
             return GameStatus.PROCESSING
         else:
@@ -33,22 +53,43 @@ class Vertical(Enemy):
 
 
 class Horizontal(Enemy):
-    left = ...
+    """ Class that inherits from abstract class Enemy.
 
-    def __init__(self, pos, speed, color):
-        Enemy.__init__(self, pos, speed, color)
-        self.left = True
+    Represents left-right wakling enemy.
 
-    def move(self, map, player_coords):
+    Attributes:
+        left (bool): current direction of mevement.
+    """
+    left: bool = True
+
+    def __init__(self, pos: tuple, color: tuple):
+        """ Constructor that firstly creates parren class Enemy.
+
+        Args:
+            pos (tuple): Enemy position.
+            color (Colors): Enemy color in RGB format.
+        """
+        Enemy.__init__(self, pos, color)
+
+    def move(self, game_map: list, player_coords: tuple) -> GameStatus:
+        """ Enemy makes 1 step to the left or 1 step to the right.
+
+        Args:
+            game_map (list): 2D array that represents game map.
+            player_coords (tuple): Current coordinates of a player to detect possible collision.
+
+        Returns:
+            GameStatus: Enumerator, that show is emeny killed player or not.
+        """
         if self.left:
-            new_pos = (self.pos[0], self.pos[1] - self.speed)
+            new_pos = (self.pos[0], self.pos[1] - 1)
         else:
-            new_pos = (self.pos[0], self.pos[1] + self.speed)
+            new_pos = (self.pos[0], self.pos[1] + 1)
 
         if new_pos == player_coords:
             self.pos = new_pos
             return GameStatus.LOSE
-        elif map[new_pos[0]][new_pos[1]] == ' ':
+        elif game_map[new_pos[0]][new_pos[1]] == ' ':
             self.pos = new_pos
             return GameStatus.PROCESSING
         else:
@@ -58,12 +99,30 @@ class Horizontal(Enemy):
 
 
 class Follower(Enemy):
+    """Class that inherits from abstract class Enemy.
 
-    def __init__(self, pos, speed, color):
-        Enemy.__init__(self, pos, speed, color)
+    Represents enemy, that follows player using A* algorithm.
+    """
+    def __init__(self, pos: tuple, color: tuple):
+        """ Constructor that firstly creates parren class Enemy.
 
-    def move(self, map, player_coords):
-        way = a_star(map, self.pos, player_coords)
+        Args:
+            pos (tuple): Enemy position.
+            color (Colors): Enemy color in RGB format.
+        """
+        Enemy.__init__(self, pos, color)
+
+    def move(self, game_map: list, player_coords: tuple) -> None:
+        """ Enemy finds the best route using A* algorithm and makes 1 stem in that direction.
+
+        Args:
+            game_map (list): 2D array that represents game map.
+            player_coords (tuple): Current coordinates of a player to detect possible collision.
+
+        Returns:
+            GameStatus: Enumerator, that show is emeny killed player or not.
+        """
+        way = a_star(game_map, self.pos, player_coords)
         if len(way) == 0:
             return GameStatus.PROCESSING
         self.pos = way[1]
@@ -71,17 +130,6 @@ class Follower(Enemy):
             return GameStatus.LOSE
         else:
             return GameStatus.PROCESSING
-
-        # if new_pos == player_coords:
-        #     self.pos = new_pos
-        #     return GameStatus.LOSE
-        # elif map[new_pos[0]][new_pos[1]] == ' ':
-        #     self.pos = new_pos
-            # return GameStatus.PROCESSING
-        # else:
-            # self.left = not self.left
-
-        return GameStatus.PROCESSING
 
 
 assert (__name__ != "__main__")
