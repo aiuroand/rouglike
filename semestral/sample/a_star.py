@@ -5,7 +5,16 @@
 from queue import PriorityQueue
 
 
-def calculate_manhattan(cell1, cell2):
+def calculate_manhattan(cell1: tuple, cell2: tuple):
+    """ Returns manhattan distance between 2 2d points.
+
+    Args:
+        cell1 (_type_): _description_
+        cell2 (_type_): _description_
+
+    Returns:
+        _type_: _description_
+    """
     return abs(cell1[0] - cell2[0]) + abs(cell1[1] - cell2[1])
 
 
