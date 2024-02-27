@@ -64,7 +64,6 @@ class Loop:
                     game = Game(self.settings[2][0], self.my_screen, self.chosen_map)
                     self.status = game.game_loop()
                     game = None
-                    print(self.status)
                 except AssertionError as e:
                     print(e.args[0])
                     self.status = Status.MENU
